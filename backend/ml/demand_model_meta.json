@@ -1,0 +1,25 @@
+{
+  "site_map": {
+    "S001": 0,
+    "S002": 1,
+    "S003": 2,
+    "S004": 3,
+    "S005": 4,
+    "S006": 5
+  },
+  "type_map": {
+    "Excavator": 0,
+    "Crane": 1,
+    "Bulldozer": 2,
+    "Grader": 3
+  },
+  "features": [
+    "site_code",
+    "type_code",
+    "day_of_week",
+    "month",
+    "site_utilization",
+    "active_projects",
+    "rentals"
+  ]
+}

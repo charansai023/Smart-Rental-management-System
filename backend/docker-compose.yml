@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: catfleet360_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: catfleet
+      POSTGRES_PASSWORD: catfleet
+      POSTGRES_DB: catfleet360
+    ports:
+      - "5432:5432"
+    volumes:
+      - catfleet_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catfleet"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: catfleet360_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: catfleet360_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://catfleet:catfleet@postgres:5432/catfleet360
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "python seed_data.py && uvicorn main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  catfleet_pg_data:
