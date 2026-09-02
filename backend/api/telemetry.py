@@ -31,7 +31,7 @@ async def post_telemetry(event: TelemetryEvent, db: Session = Depends(get_db)):
     for alert in new_alerts:
         await manager.broadcast("new_alert", {
             "id": alert.id, "equipment_id": alert.equipment_id,
-            "level": alert.level, "title": alert.title, "body": alert.body,
+            "level": alert.level, "kind": alert.kind, "title": alert.title, "body": alert.body,
         })
 
     return {"ok": True}

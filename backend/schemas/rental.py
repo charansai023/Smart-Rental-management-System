@@ -8,6 +8,7 @@ class CheckoutRequest(BaseModel):
     operator_id: str
     site_id: str
     rental_days: int = 7              # how long the rental is expected to run
+    operator_email: Optional[str] = None
 
 
 class CheckinRequest(BaseModel):

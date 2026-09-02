@@ -7,3 +7,4 @@ class Operator(Base):
 
     operator_id = Column(String, primary_key=True)  # e.g. OP101
     name = Column(String, nullable=False)
+    email = Column(String, nullable=True)

@@ -10,6 +10,7 @@ export default function CheckoutModal({ equipmentOptions, defaultEquipmentId, on
   const { checkout, notify, equipment } = useFleetData();
   const [equipmentId, setEquipmentId] = useState(defaultEquipmentId || equipmentOptions?.[0]?.equipment_id || "");
   const [operatorId, setOperatorId] = useState(OPERATORS[0].operator_id);
+  const [operatorEmail, setOperatorEmail] = useState("");
   const [siteId, setSiteId] = useState(SITES[0].site_id);
   const [days, setDays] = useState(7);
   const [submitting, setSubmitting] = useState(false);
@@ -24,6 +25,7 @@ export default function CheckoutModal({ equipmentOptions, defaultEquipmentId, on
       await checkout({
         qr_code: `EQUIPMENT:${equipmentId}`,
         operator_id: operatorId,
+        operator_email: operatorEmail || null,
         site_id: siteId,
         rental_days: Number(days),
       });
@@ -138,6 +140,16 @@ export default function CheckoutModal({ equipmentOptions, defaultEquipmentId, on
                 </option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Operator Email (Gmail)</label>
+            <input
+              type="email"
+              placeholder="e.g. operator@gmail.com"
+              value={operatorEmail}
+              onChange={(e) => setOperatorEmail(e.target.value)}
+              className="w-full border border-slate-300 rounded-lg px-3.5 py-2 text-sm bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 text-slate-900 placeholder:text-slate-400"
+            />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Deployment Site</label>

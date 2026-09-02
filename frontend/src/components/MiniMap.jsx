@@ -19,17 +19,45 @@ export default function MiniMap({ equipment, linkToDetail = true, height = "" })
   const withLocation = equipment.filter((e) => e.latitude && e.longitude);
 
   return (
-    <div className={`relative flex-1 min-h-[240px] ${height} bg-slate-900 rounded-xl overflow-hidden border border-slate-800 shadow-inner`}>
-      {/* Grid pattern evoking map view */}
+    <div className={`relative flex-1 min-h-[240px] ${height} bg-[#f0f3f5] rounded-xl overflow-hidden border border-slate-300 shadow-inner`}>
+      {/* Abstract Map Terrain Features */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Fake Water Bodies */}
+        <div className="absolute -bottom-32 -right-10 w-[400px] h-[400px] bg-[#dbeafe] rounded-[100px] rotate-12 blur-xl opacity-80" />
+        <div className="absolute top-10 -left-20 w-[300px] h-[300px] bg-[#dbeafe] rounded-full blur-xl opacity-80" />
+        
+        {/* Fake Parks / Land */}
+        <div className="absolute top-1/4 right-1/4 w-48 h-48 bg-[#dcfce7] rounded-full blur-xl opacity-60" />
+        <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-[#dcfce7] rounded-[80px] rotate-45 blur-xl opacity-60" />
+      </div>
+
+      {/* Main Street Grid */}
       <div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-70 pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
+            "linear-gradient(#ffffff 2px, transparent 2px), linear-gradient(90deg, #ffffff 2px, transparent 2px)",
+          backgroundSize: "80px 80px",
+          backgroundPosition: "center",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-transparent to-slate-900/60" />
+      {/* Sub Street Grid */}
+      <div
+        className="absolute inset-0 opacity-40 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+          backgroundPosition: "center",
+        }}
+      />
+
+      {/* Map Zone Labels */}
+      <div className="absolute top-[25%] left-[60%] text-[10px] font-bold text-slate-400 uppercase tracking-widest select-none pointer-events-none mix-blend-multiply">North Sector</div>
+      <div className="absolute bottom-[35%] right-[65%] text-[10px] font-bold text-slate-400 uppercase tracking-widest select-none pointer-events-none mix-blend-multiply">South Sector</div>
+      
+      {/* Inner Shadow for depth */}
+      <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] pointer-events-none" />
 
       {withLocation.map((eq) => {
         const { x, y } = project(eq.latitude, eq.longitude);

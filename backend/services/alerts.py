@@ -13,13 +13,32 @@ def _alert_exists_unacked(db: Session, equipment_id: str, kind: str) -> bool:
     )
 
 
-def raise_alert(db: Session, equipment_id: str, level: str, kind: str, title: str, body: str) -> Alert | None:
+def raise_alert(db: Session, equipment_id: str, level: str, kind: str, title: str, body: str, anomaly_score: float = None) -> Alert | None:
     if _alert_exists_unacked(db, equipment_id, kind):
         return None  # don't spam duplicate alerts every tick
     alert = Alert(equipment_id=equipment_id, level=level, kind=kind, title=title, body=body)
     db.add(alert)
     db.commit()
     db.refresh(alert)
+
+    if level == "critical":
+        eq = db.get(Equipment, equipment_id)
+        if eq and eq.current_operator_id:
+            from models import Operator
+            op = db.get(Operator, eq.current_operator_id)
+            if op and op.email:
+                from services.email import send_anomaly_email
+                send_anomaly_email(
+                    recipient_email=op.email,
+                    equipment_id=eq.equipment_id,
+                    equipment_type=eq.type,
+                    site=eq.site_id or "Unknown",
+                    operator_name=op.name,
+                    alert_level=level,
+                    alert_title=title,
+                    alert_body=body,
+                    anomaly_score=anomaly_score
+                )
     return alert
 
 
@@ -58,6 +77,7 @@ def evaluate_equipment(db: Session, equipment: Equipment) -> list[Alert]:
             db, equipment.equipment_id, "critical", "anomaly",
             f"{equipment.equipment_id} usage anomaly detected",
             f"IsolationForest model detected telemetry anomaly (score {score:.2f}). Possible misuse or unassigned operation.",
+            anomaly_score=score
         )
         if a:
             new_alerts.append(a)

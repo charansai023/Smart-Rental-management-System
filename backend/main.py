@@ -26,7 +26,7 @@ async def overdue_checker_loop():
             for alert in new_alerts:
                 await manager.broadcast("new_alert", {
                     "id": alert.id, "equipment_id": alert.equipment_id,
-                    "level": alert.level, "title": alert.title, "body": alert.body,
+                    "level": alert.level, "kind": alert.kind, "title": alert.title, "body": alert.body,
                 })
         finally:
             db.close()

@@ -30,8 +30,12 @@ def checkout(db: Session, req: CheckoutRequest) -> Rental:
             f"Cannot checkout — {equipment_id} is currently {equipment.status}."
         )
 
-    if not db.get(Operator, req.operator_id):
+    operator = db.get(Operator, req.operator_id)
+    if not operator:
         raise RentalError(f"Operator '{req.operator_id}' is not valid.")
+        
+    if req.operator_email:
+        operator.email = req.operator_email
 
     if not db.get(Site, req.site_id):
         raise RentalError(f"Site '{req.site_id}' is not valid.")
@@ -55,6 +59,18 @@ def checkout(db: Session, req: CheckoutRequest) -> Rental:
 
     db.commit()
     db.refresh(rental)
+    
+    if operator.email:
+        from services.email import send_checkout_email
+        send_checkout_email(
+            recipient_email=operator.email,
+            equipment_id=equipment_id,
+            equipment_type=equipment.type,
+            site=req.site_id,
+            operator_name=operator.name,
+            rental_days=req.rental_days
+        )
+        
     return rental
 
 

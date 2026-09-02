@@ -20,14 +20,15 @@ SITES = [
     ("S006", "Nagpur Site", 21.1458, 79.0882),
 ]
 
+# Demo email addresses — use clearly fake/example addresses; do NOT use real personal emails.
 OPERATORS = [
-    ("OP101", "Ramesh Kumar"),
-    ("OP106", "Arjun Rao"),
-    ("OP114", "Vikram Singh"),
-    ("OP203", "Suresh Nair"),
-    ("OP301", "Manoj Patil"),
-    ("OP401", "Divya Menon"),
-    ("OP402", "Karthik Iyer"),
+    ("OP101", "Ramesh Kumar",  "operator101@example.com"),
+    ("OP106", "Arjun Rao",     "operator106@example.com"),
+    ("OP114", "Vikram Singh",  "operator114@example.com"),
+    ("OP203", "Suresh Nair",   "operator203@example.com"),
+    ("OP301", "Manoj Patil",   "operator301@example.com"),
+    ("OP401", "Divya Menon",   "operator401@example.com"),
+    ("OP402", "Karthik Iyer",  "operator402@example.com"),
 ]
 
 # From the challenge dataset sheet:
@@ -50,9 +51,13 @@ def seed():
             if not db.get(Site, site_id):
                 db.add(Site(site_id=site_id, name=name, latitude=lat, longitude=lng))
 
-        for op_id, name in OPERATORS:
-            if not db.get(Operator, op_id):
-                db.add(Operator(operator_id=op_id, name=name))
+        for op_id, name, email in OPERATORS:
+            existing = db.get(Operator, op_id)
+            if not existing:
+                db.add(Operator(operator_id=op_id, name=name, email=email))
+            elif not existing.email:
+                # Backfill email on existing rows that were seeded without one.
+                existing.email = email
         db.commit()
 
         for eq_id, eq_type, site_id, checkout, checkin, engine_hrs, idle_hrs, days, operator in EQUIPMENT_HISTORY:
